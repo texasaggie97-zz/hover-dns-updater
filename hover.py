@@ -20,7 +20,7 @@ password = "password"
  
 # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
 # Look for the subdomain record that you want to update and put its id here.
-dns_id = "dns0000000"
+dns_ids = ["dns0000000"]
  
 class HoverException(Exception):
     pass
@@ -57,10 +57,11 @@ if ip.ok:
     try:
         for domain in current.get("domains"):
             for entry in domain["entries"]:
-                if entry["id"] == dns_id and entry["content"] == current_ip:
+                if entry["id"] in dns_ids and entry["content"] == current_ip:
                     same_ip = True
     except:
         pass
 
     if not same_ip:
-        client.call("put", "dns/" + dns_id, {"content": current_ip})
+        for dns_id in dns_ids:
+            client.call("put", "dns/" + dns_id, {"content": current_ip})
