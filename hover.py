@@ -11,32 +11,111 @@ __maintainer__ = "Mark Silva"
 __email__ = ""
 __status__ = "Alpha"
 
-import requests
+import datetime
 import json
+import ipgetter
+import logging
+import requests
+import time
 
-# Your hover.com username and password
-username = "username"
-password = "password"
+default_config = {
+    # Your hover.com username and password
+    'username': 'username',
+    'password': 'password',
+    # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
+    # Look for the subdomain record(s) that you want to update and put its/their id(s) here.
+    'dns_ids': ['dns0000000'],
+    'logfile': None,
+    'run-as-service': False,
+    'poll-time': 600,  # 10 minutes
+}
 
-# Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
-# Look for the subdomain record(s) that you want to update and put its/their id(s) here.
-dns_ids = ["dns0000000"]
+
+
+def configure_logging(lvl=logging.Info, logfile=None):
+    root = logging.getLogger()
+    root.setLevel(lvl)
+
+    formatter = logging.Formatter("[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(funcName)s:%(lineno)s)", "%Y-%m-%d %H:%M:%S")
+    if logfile is None:
+        hndlr = logging.StreamHandler(sys.stdout)
+    else:
+        print("Logging to file %s" % logfile)
+        hndlr = logging.FileHandler(logfile)
+    hndlr.setFormatter(formatter)
+    root.addHandler(hndlr)
+
+
+class HoverConfig():
+    def __init__(self, args):
+        self._config = default_config
+        try:
+            with open(args.config_file, 'r') as c:
+                config = json.load(c)
+                for k in config:
+                    self._config[k] = config[k]
+        except FileNotFoundError:
+            with open(configfile, 'w') as c:
+                json.dump(default_config, c)
+            sys.exit(1)
+
+        # Override config file with command line parameters
+        self.USERNAME = self._config['username']
+        self.PASSWORD = self._config['password']
+        self.DNS_IDS = self.c_onfig['dns_ids']
+        self.LOGFILE = if args.log_file is None self._config['logfile'] else args.log_file
+        self.SERVICE = if args.service is None self._config['run-as-service'] else args.service
+        self.POLLTIME = if args.poll_time self._config['poll-time'] else args.poll_time
+
 
 class HoverException(Exception):
     pass
 
 
 class HoverAPI(object):
-    def __init__(self, username, password):
-        params = {"username": username, "password": password}
+    def __init__(self, config):
+        self._config = config
+        self._current_dns_ips = {}
+        self.get_auth()
+        self.get_current_ips()
+
+    def get_auth(self):
+        logging.info('Logging in')
+        params = {"username": self._config.USERNAME, "password": self._config.PASSWORD}
         r = requests.post("https://www.hover.com/api/login", params=params)
         if not r.ok or "hoverauth" not in r.cookies:
             raise HoverException(r)
-        self.cookies = {"hoverauth": r.cookies["hoverauth"]}
+        self._cookies = {"hoverauth": r.cookies["hoverauth"]}
+        self._auth_timestamp = datetime.now()
+
+    def check_auth(self):
+        td = datetime.now() - self._auth_timestamp
+        # We will cache the login authorization for two hours
+        if td.total_seconds() > (2 * 60 * 60):
+            self.get_auth()
+
+    def get_current_ips(self):
+        logging.info('Getting current IP addresses from Hover:')
+        current = self.call("get", "dns")
+        for domain in current.get('domains'):
+            for entry in domain['entries']:
+                if entry['id'] in self._config.DNS_IDS:
+                    logging.info('    {0} = {1}'.format(entry['id'], entry['content'])
+                    self._current_dns_ips[entry['id']] = entry['content']
+
+    def update(self):
+        logging.debug('Updating')
+        current_external_ip = ipgetter.myip()
+        for dns_id in self._current_dns_ips:
+            if self._current_dns_ips[dns_id] != current_external_ip:
+                logging.info('    Updating DNS entry for {0} to {1}'.format(dns_id, current_external_ip))
+                self.call('put', 'dns/' + dns_id, {'content': current_external_ip})
 
     def call(self, method, resource, data=None):
+        logging.debug('method={0}, resource={1}, data={2}'.format(method, resource, str(data)))
+        self.check_auth()
         url = "https://www.hover.com/api/{0}".format(resource)
-        r = requests.request(method, url, data=data, cookies=self.cookies)
+        r = requests.request(method, url, data=data, cookies=self._cookies)
         if not r.ok:
             raise HoverException(r)
         if r.content:
@@ -45,24 +124,90 @@ class HoverAPI(object):
                 raise HoverException(body)
             return body
 
-ip = requests.post("http://bot.whatismyipaddress.com")
-if ip.ok:
-    # connect to the API using your account
-    client = HoverAPI(username, password)
+def _parse_args(argv):
+    import argparse
+    parser = argparse.ArgumentParser()
 
-    current_ip = ip.content
-    same_ip = False
+    config_group = parser.add_argument_group("Configuration options")
+    config_group.add_argument(
+        "-c", "--config-file", default='hover-update.cfg',
+        action="store", help="Config file, in json format. If it does not exist, one will be created with default values.")
+    config_group.add_argument(
+        "--service", default=None,
+        action="store", help="Run as a service")
+    config_group.add_argument(
+        "--poll-time", default=None,
+        action="store", help="Time in seconds to sleep between polling the ip address")
 
-    current = client.call("get", "dns")
+    verbosity_group = parser.add_argument_group("Verbosity, Logging & Debugging")
+    verbosity_group.add_argument(
+        "-v", "--verbose",
+        action="count", default=0,
+        help="Print debug information.  Can be repeated for more detailed output.")
+    verbosity_group.add_argument(
+        "-q", "--quiet",
+        action="count", default=0,
+        help="Print only essential information.  Can be repeated for quieter output.")
+    verbosity_group.add_argument(
+        "--test",
+        action="store_true", default=False,
+        help="Run doctests then quit.")
+    verbosity_group.add_argument(
+        "--log-file",
+        action="store", default=None,
+        help="Send logging to listed file instead of stdout")
 
-    try:
-        for domain in current.get("domains"):
-            for entry in domain["entries"]:
-                if entry["id"] in dns_ids and entry["content"] == current_ip:
-                    same_ip = True
-    except:
-        pass
+    args = parser.parse_args(argv)
 
-    if not same_ip:
-        for dns_id in dns_ids:
-            client.call("put", "dns/" + dns_id, {"content": current_ip})
+    # We want to default to WARNING
+    # Verbosity gives us granularity to control past that
+    if 0 < args.verbose and 0 < args.quiet:
+        parser.error("Mixing --verbose and --quiet is contradictory")
+    # We start logging level at INFO
+    verbosity = 1 + args.quiet - args.verbose
+    verbosity = max(verbosity, 0)
+    verbosity = min(verbosity, 4)
+    args.logging_level = {
+        0: logging.DEBUG,
+        1: logging.INFO,
+        2: logging.WARNING,
+        3: logging.ERROR,
+        4: logging.CRITICAL,
+    }[verbosity]
+
+    if args.test:
+        return args
+
+    return args
+
+def _main(config):
+    client = HoverAPI(config)
+
+    while True:
+        client.update()
+        # If we are not running as a service we only want to update once
+        if not config.SERVICE:
+            break
+
+        time.sleep(config.POLLTIME)
+
+
+
+def main():  # pragma: no cover
+    import sys
+    args = _parse_args(sys.argv[1:])
+    config = HoverConfig(args)
+
+    configure_logging(args.logging_level, config.LOGFILE)
+
+    if args.test:
+        import doctest
+        print(doctest.testmod())
+        return 0
+
+    ret_code = _main(config)
+    sys.exit(ret_code)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
