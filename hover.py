@@ -19,6 +19,9 @@ import requests
 import sys
 import time
 
+import pprint
+pp = pprint.PrettyPrinter(width=120)
+
 default_config = {
     # Your hover.com username and password
     'username': 'username',
@@ -32,7 +35,7 @@ default_config = {
 }
 
 
-def configure_logging(lvl=logging.Info, logfile=None):
+def configure_logging(lvl=logging.INFO, logfile=None):
     root = logging.getLogger()
     root.setLevel(lvl)
 
@@ -64,10 +67,20 @@ class HoverConfig(object):
         # Override config file with command line parameters
         self.USERNAME = self._config['username']
         self.PASSWORD = self._config['password']
-        self.DNS_IDS = self.c_onfig['dns_ids']
+        self.DNS_IDS = self._config['dns_ids']
         self.LOGFILE = self._config['logfile'] if args.log_file is None else args.log_file
         self.SERVICE = self._config['run-as-service'] if args.service is None else args.service
         self.POLLTIME = self._config['poll-time'] if args.poll_time is None else args.poll_time
+
+    def __repr__(self):
+        ret_str = self.__class__.__name__ + '():\n'
+        ret_str += '    USERNAME = {0}\n'.format(self.USERNAME)
+        ret_str += '    PASSWORD = {0}\n'.format(self.PASSWORD)
+        ret_str += '    DNS_IDS = {0}\n'.format(pp.pformat(self.DNS_IDS))
+        ret_str += '    LOGFILE = {0}\n'.format(str(self.LOGFILE))
+        ret_str += '    SERVICE = {0}\n'.format(str(self.SERVICE))
+        ret_str += '    POLLTIME = {0}\n'.format(str(self.POLLTIME))
+        return ret_str
 
 
 class HoverException(Exception):
@@ -136,8 +149,8 @@ def _parse_args(argv):
         "-c", "--config-file", default='hover-update.cfg', action="store",
         help="Config file, in json format. If it does not exist, one will be created with default values.")
     config_group.add_argument(
-        "--service", default=None,
-        action="store", help="Run as a service")
+        "--service", default=False,
+        action="store_true", help="Run as a service")
     config_group.add_argument(
         "--poll-time", default=None,
         action="store", help="Time in seconds to sleep between polling the ip address")
@@ -204,8 +217,9 @@ def main():  # pragma: no cover
     configure_logging(args.logging_level, config.LOGFILE)
 
     if args.test:
-        import doctest
-        print(doctest.testmod())
+        #import doctest
+        #print(doctest.testmod())
+        pp.pprint(config)
         return 0
 
     ret_code = _main(config)
