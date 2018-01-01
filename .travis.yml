@@ -10,7 +10,8 @@ python:
 
 install:
 # coveralls
-  - pip install --upgrade tox tox-travis
+  - pip install --upgrade tox-travis
+  - pip install --upgrade coveralls
 
 script:
   - tox
