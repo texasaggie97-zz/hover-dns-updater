@@ -19,7 +19,7 @@ username = "username"
 password = "password"
  
 # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
-# Look for the subdomain record that you want to update and put its id here.
+# Look for the subdomain record(s) that you want to update and put its/their id(s) here.
 dns_ids = ["dns0000000"]
  
 class HoverException(Exception):
