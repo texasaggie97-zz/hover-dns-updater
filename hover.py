@@ -217,8 +217,8 @@ def main():  # pragma: no cover
     configure_logging(args.logging_level, config.LOGFILE)
 
     if args.test:
-        #import doctest
-        #print(doctest.testmod())
+        # import doctest
+        # print(doctest.testmod())
         pp.pprint(config)
         return 0
 
