@@ -101,10 +101,10 @@ class HoverAPI(object):
         if not r.ok or "hoverauth" not in r.cookies:
             raise HoverException(r)
         self._cookies = {"hoverauth": r.cookies["hoverauth"]}
-        self._auth_timestamp = datetime.now()
+        self._auth_timestamp = datetime.datetime.now()
 
     def check_auth(self):
-        td = datetime.now() - self._auth_timestamp
+        td = datetime.datetime.now() - self._auth_timestamp
         # We will cache the login authorization for two hours
         if td.total_seconds() > (2 * 60 * 60):
             self.get_auth()
@@ -121,6 +121,7 @@ class HoverAPI(object):
     def update(self):
         logging.debug('Updating')
         current_external_ip = ipgetter.myip()
+        logging.info('    Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
             if self._current_dns_ips[dns_id] != current_external_ip:
                 logging.info('    Updating DNS entry for {0} to {1}'.format(dns_id, current_external_ip))
