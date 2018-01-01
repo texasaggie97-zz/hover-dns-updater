@@ -12,10 +12,11 @@ __email__ = ""
 __status__ = "Alpha"
 
 import datetime
-import json
 import ipgetter
+import json
 import logging
 import requests
+import sys
 import time
 
 default_config = {
@@ -31,12 +32,13 @@ default_config = {
 }
 
 
-
 def configure_logging(lvl=logging.Info, logfile=None):
     root = logging.getLogger()
     root.setLevel(lvl)
 
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(funcName)s:%(lineno)s)", "%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(funcName)s:%(lineno)s)",
+        "%Y-%m-%d %H:%M:%S")
     if logfile is None:
         hndlr = logging.StreamHandler(sys.stdout)
     else:
@@ -46,7 +48,7 @@ def configure_logging(lvl=logging.Info, logfile=None):
     root.addHandler(hndlr)
 
 
-class HoverConfig():
+class HoverConfig(object):
     def __init__(self, args):
         self._config = default_config
         try:
@@ -55,7 +57,7 @@ class HoverConfig():
                 for k in config:
                     self._config[k] = config[k]
         except FileNotFoundError:
-            with open(configfile, 'w') as c:
+            with open(args.config_file, 'w') as c:
                 json.dump(default_config, c)
             sys.exit(1)
 
@@ -63,9 +65,9 @@ class HoverConfig():
         self.USERNAME = self._config['username']
         self.PASSWORD = self._config['password']
         self.DNS_IDS = self.c_onfig['dns_ids']
-        self.LOGFILE = if args.log_file is None self._config['logfile'] else args.log_file
-        self.SERVICE = if args.service is None self._config['run-as-service'] else args.service
-        self.POLLTIME = if args.poll_time self._config['poll-time'] else args.poll_time
+        self.LOGFILE = self._config['logfile'] if args.log_file is None else args.log_file
+        self.SERVICE = self._config['run-as-service'] if args.service is None else args.service
+        self.POLLTIME = self._config['poll-time'] if args.poll_time is None else args.poll_time
 
 
 class HoverException(Exception):
@@ -100,7 +102,7 @@ class HoverAPI(object):
         for domain in current.get('domains'):
             for entry in domain['entries']:
                 if entry['id'] in self._config.DNS_IDS:
-                    logging.info('    {0} = {1}'.format(entry['id'], entry['content'])
+                    logging.info('    {0} = {1}'.format(entry['id'], entry['content']))
                     self._current_dns_ips[entry['id']] = entry['content']
 
     def update(self):
@@ -124,14 +126,15 @@ class HoverAPI(object):
                 raise HoverException(body)
             return body
 
+
 def _parse_args(argv):
     import argparse
     parser = argparse.ArgumentParser()
 
     config_group = parser.add_argument_group("Configuration options")
     config_group.add_argument(
-        "-c", "--config-file", default='hover-update.cfg',
-        action="store", help="Config file, in json format. If it does not exist, one will be created with default values.")
+        "-c", "--config-file", default='hover-update.cfg', action="store",
+        help="Config file, in json format. If it does not exist, one will be created with default values.")
     config_group.add_argument(
         "--service", default=None,
         action="store", help="Run as a service")
@@ -180,6 +183,7 @@ def _parse_args(argv):
 
     return args
 
+
 def _main(config):
     client = HoverAPI(config)
 
@@ -190,7 +194,6 @@ def _main(config):
             break
 
         time.sleep(config.POLLTIME)
-
 
 
 def main():  # pragma: no cover
