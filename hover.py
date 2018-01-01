@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 """hover.py: Provides dynamic DNS functionality for Hover.com using their unofficial API. 
-   This script is based off one by Dan Krause: https://gist.github.com/dankrause/5585907"""
+   This script is based off one by Andrew Barilla: https://gist.github.com/andybarilla/b0dd93e71ff18303c059"""
 
-__author__      = "Andrew Barilla"
-__credits__ = ["Andrew Barilla", "Dan Krause"]
+__author__      = "Mark Silva"
+__credits__ = ["Mark Silva", "Andrew Barilla", "Dan Krause"]
 __license__ = "GPL"
 __version__ = "1.0"
-__maintainer__ = "Andrew Barilla"
-__email__ = "andrew@exit66.com"
-__status__ = "Production"
+__maintainer__ = "Mark Silva"
+__email__ = ""
+__status__ = "Alpha"
 
 import requests
 import json
