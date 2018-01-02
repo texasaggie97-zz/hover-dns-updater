@@ -119,9 +119,8 @@ class HoverAPI(object):
                     self._current_dns_ips[entry['id']] = entry['content']
 
     def update(self):
-        logging.debug('Updating')
         current_external_ip = ipgetter.myip()
-        logging.info('    Current external IP = {0}'.format(current_external_ip))
+        logging.info('Updating - Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
             logging.debug('    {0} = {1}'.format(dns_id, self._current_dns_ips[dns_id]))
             if self._current_dns_ips[dns_id] != current_external_ip:
