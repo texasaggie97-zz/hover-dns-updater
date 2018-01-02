@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Make sure the service is stopped
-sudo service stop hover-dns-updater
+sudo service hover-dns-updater stop
 
 sudo mkdir /etc/hover-dns-updater
 sudo cp -f ./hover-dns-updater.py /etc/hover-dns-updater
