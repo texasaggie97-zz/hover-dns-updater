@@ -14,7 +14,7 @@ sudo chown root:root /etc/hover-dns-updater/*
 sudo chown root:root /etc/systemd/system/hover-dns-updater.service
 
 # Install service into systemd
-sudo systemctl daemon reload
+sudo systemctl daemon-reload
 sudo systemctl enable hover-dns-updater
 
 
