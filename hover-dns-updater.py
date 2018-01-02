@@ -120,6 +120,11 @@ class HoverAPI(object):
 
     def update(self):
         current_external_ip = ipgetter.myip()
+        # At least one of the websites used to get the external ip occasionally returns '192.168.0.255'
+        # We keep trying until it isn't that.
+        while current_external_ip == '192.168.0.255':
+            current_external_ip = ipgetter.myip()
+
         logging.info('Updating - Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
             logging.debug('    {0} = {1}'.format(dns_id, self._current_dns_ips[dns_id]))
