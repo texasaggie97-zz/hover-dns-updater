@@ -123,9 +123,12 @@ class HoverAPI(object):
         current_external_ip = ipgetter.myip()
         logging.info('    Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
+            logging.debug('    {0} = {1}'.format(dns_id, self._current_dns_ips[dns_id]))
             if self._current_dns_ips[dns_id] != current_external_ip:
                 logging.info('    Updating DNS entry for {0} to {1}'.format(dns_id, current_external_ip))
                 self.call('put', 'dns/' + dns_id, {'content': current_external_ip})
+                # Update cache
+                self._current_dns_ips[dns_id] = current_external_ip
 
     def call(self, method, resource, data=None):
         logging.debug('method={0}, resource={1}, data={2}'.format(method, resource, str(data)))
@@ -202,12 +205,17 @@ def _main(config):
     client = HoverAPI(config)
 
     while True:
-        client.update()
-        # If we are not running as a service we only want to update once
-        if not config.SERVICE:
-            break
+        try:
+            client.update()
+            # If we are not running as a service we only want to update once
+            if not config.SERVICE:
+                break
 
-        time.sleep(config.POLLTIME)
+            logging.debug('Sleeping.... Z Z Z Z')
+            time.sleep(config.POLLTIME)
+        except KeyboardInterrupt:
+            logging.info('Exiting from Control-C')
+            break
 
 
 def main():  # pragma: no cover
