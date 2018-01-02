@@ -121,7 +121,7 @@ class HoverAPI(object):
     def update(self):
         current_external_ip = ipgetter.myip()
         # At least one of the websites used to get the external ip occasionally returns '192.168.0.255'
-        # We keep trying until it isn't that.
+        # We keep trying until it isn't that. https://github.com/texasaggie97/hover-dns-updater/issues/1
         while current_external_ip == '192.168.0.255':
             current_external_ip = ipgetter.myip()
 
