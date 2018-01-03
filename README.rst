@@ -27,41 +27,41 @@ Installation
 Prerequisites:
 --------------
 
-    * Python 3
-        * `Download <https://www.python.org/downloads/>`_
-    * pip3
-        * Linux - `sudo apt-get install -y python3-pip`
-        * Windows - `python -m ensurepip --upgrade`
-    * Installed packages
-        * requests
-            * Linux - `sudo pip3 install --upgrade requests`
-            * Windows - `pip install --upgrade requests`
-        * ipgetter
-            * Linux - `sudo pip3 install --upgrade ipgetter`
+* Python 3
+    * `Download <https://www.python.org/downloads/>`_
+* pip3
+    * Linux - `sudo apt-get install -y python3-pip`
+    * Windows - `python -m ensurepip --upgrade`
+* Installed packages
+    * requests
+        * Linux - `sudo pip3 install --upgrade requests`
+        * Windows - `pip install --upgrade requests`
+    * ipgetter
+        * Linux - `sudo pip3 install --upgrade ipgetter`
             * Windows - `pip install --upgrade ipgetter`
 
 Hover DNS IDs:
 --------------
 
-    * Login to `Hover.com <https://hover.com>`_
-    * In the same browser go to `https://www.hover.com/api/domains/YOURDOMAIN.COM/dns` replacing YOURDOMAIN.COM with the domain you want to update
-    * This will return a json file. If you use Firefox, this will be nicely formatted.
-    * In the "entries" list, look for the DNS records you want to keep up to date and make a note of the associated "id"s. They should look something like "dns1234567"
+* Login to `Hover.com <https://hover.com>`_
+* In the same browser go to `https://www.hover.com/api/domains/YOURDOMAIN.COM/dns` replacing YOURDOMAIN.COM with the domain you want to update
+* This will return a json file. If you use Firefox, this will be nicely formatted.
+* In the "entries" list, look for the DNS records you want to keep up to date and make a note of the associated "id"s. They should look something like "dns1234567"
 
 Install Ubuntu service:
 -----------------------
 
-    * Copy `INSTALL.sh`, `hover-dns-updater.service`, and `hover-dns-updater.py` to a folder on you Ubuntu system
-    * `./INSTALL.sh`
-    * This will install and enable, but not start, the hover-dns-updater service
-    * `sudo nano /etc/hover-dns-updater/hover-dns-updater.json` (or use the editor of your choice)
-        * Fill in your hover username and password
-        * Add the dns ids you noted above
-        * Optional - change `None` to the log file name
-        * Optional - change poll time, in seconds. Default is 10 minutes
-        * When running as an Ubuntu service, the service value in the confg file is ignored.
-    * After configuration file is updated, start the service `sudo service hover-dns-updater start`
-    * Option - Verify service started correctly `sudo service hover-dns-updater status`
+* Copy `INSTALL.sh`, `hover-dns-updater.service`, and `hover-dns-updater.py` to a folder on you Ubuntu system
+* `./INSTALL.sh`
+* This will install and enable, but not start, the hover-dns-updater service
+* `sudo nano /etc/hover-dns-updater/hover-dns-updater.json` (or use the editor of your choice)
+    * Fill in your hover username and password
+    * Add the dns ids you noted above
+    * Optional - change `None` to the log file name
+    * Optional - change poll time, in seconds. Default is 10 minutes
+    * When running as an Ubuntu service, the service value in the confg file is ignored.
+* After configuration file is updated, start the service `sudo service hover-dns-updater start`
+* Option - Verify service started correctly `sudo service hover-dns-updater status`
 
 
 Contributing
