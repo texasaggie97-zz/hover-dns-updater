@@ -6,7 +6,7 @@
 __author__ = "Mark Silva"
 __credits__ = ["Mark Silva", "Andrew Barilla", "Dan Krause"]
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "0.1.0.dev0"
 __maintainer__ = "Mark Silva"
 __email__ = ""
 __status__ = "Alpha"
