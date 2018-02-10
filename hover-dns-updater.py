@@ -117,7 +117,7 @@ class HoverAPI(object):
 
     def get_auth(self):
         logging.info('Logging in')
-        data = {"password": self._config.PASSWORD, "username": self._config.USERNAME, }
+        data = {"password" : self._config.PASSWORD ,"username" : self._config.USERNAME }
         data_json = json.dumps(data)
         headers = {'Content-type': 'application/json'}
         r = requests.post("https://www.hover.com/signin", data=data_json, headers=headers)
