@@ -15,21 +15,23 @@ import datetime
 import ipgetter
 import json
 import logging
+import logging.handlers
 import requests
 import sys
 import time
+import os
 
 import pprint
 pp = pprint.PrettyPrinter(width=120)
 
 default_config = {
     # Your hover.com username and password
-    'username': 'username',
-    'password': 'password',
+    'username': 'ENV',
+    'password': 'ENV',
     # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
     # Look for the subdomain record(s) that you want to update and put its/their id(s) here.
-    'dns_ids': ['dns0000000'],
-    'logfile': None,
+    'dns_ids': ['ENV'],
+    'logfile': '/logs/docker-hover-dns.updater.log',
     'run-as-service': False,
     'poll-time': 600,  # 10 minutes
 }
@@ -46,13 +48,14 @@ def configure_logging(lvl=logging.INFO, logfile=None):
         hndlr = logging.StreamHandler(sys.stdout)
     else:
         print("Logging to file %s" % logfile)
-        hndlr = logging.FileHandler(logfile)
+        hndlr = logging.handlers.RotatingFileHandler(logfile, maxBytes=20000000, backupCount=5)
     hndlr.setFormatter(formatter)
     root.addHandler(hndlr)
 
 
 class HoverConfig(object):
     def __init__(self, args):
+        print('0. ')
         self._config = default_config
         try:
             with open(args.config_file, 'r') as c:
@@ -71,6 +74,24 @@ class HoverConfig(object):
         self.LOGFILE = self._config['logfile'] if args.log_file is None else args.log_file
         self.SERVICE = self._config['run-as-service'] if args.service is None else args.service
         self.POLLTIME = self._config['poll-time'] if args.poll_time is None else args.poll_time
+
+        if self.USERNAME == 'ENV':
+            self.USERNAME = os.environ['USERNAME']
+        if self.PASSWORD == 'ENV':
+            self.PASSWORD = os.environ['PASSWORD']
+        if self.LOGFILE == 'ENV':
+            self.LOGFILE = os.environ['LOGFILE']
+        if len(self.DNS_IDS) == 1 and self.DNS_IDS[0] == 'ENV':
+            self.DNS_IDS = []
+            i = 1
+            # We expect the environment variable to be DNS1, DNS2, ... DNSn
+            while True:
+                try:
+                    id = 'DNS{0}'.format(i)
+                    self.DNS_IDS.append(os.environ[id])
+                    i += 1
+                except KeyError:
+                    break
 
     def __repr__(self):
         ret_str = self.__class__.__name__ + '():\n'
@@ -96,8 +117,10 @@ class HoverAPI(object):
 
     def get_auth(self):
         logging.info('Logging in')
-        params = {"username": self._config.USERNAME, "password": self._config.PASSWORD}
-        r = requests.post("https://www.hover.com/api/login", params=params)
+        data = {"password": self._config.PASSWORD, "username": self._config.USERNAME, }
+        data_json = json.dumps(data)
+        headers = {'Content-type': 'application/json'}
+        r = requests.post("https://www.hover.com/signin", data=data_json, headers=headers)
         if not r.ok or "hoverauth" not in r.cookies:
             raise HoverException(r)
         self._cookies = {"hoverauth": r.cookies["hoverauth"]}
@@ -120,11 +143,6 @@ class HoverAPI(object):
 
     def update(self):
         current_external_ip = ipgetter.myip()
-        # At least one of the websites used to get the external ip occasionally returns '192.168.0.255'
-        # We keep trying until it isn't that. https://github.com/texasaggie97/hover-dns-updater/issues/1
-        while current_external_ip == '192.168.0.255':
-            current_external_ip = ipgetter.myip()
-
         logging.info('Updating - Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
             logging.debug('    {0} = {1}'.format(dns_id, self._current_dns_ips[dns_id]))
