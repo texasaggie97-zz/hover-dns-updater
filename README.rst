@@ -118,7 +118,7 @@ docker-compose.yml:
                     PASSWORD: "password"
                     DNS1: "dns00000000"
                     DNS2: "dns00000001"
-                    LOGFILE: "/logs/docker-hover-dns.updater.log"
+                    LOGFILE: "/logs/docker-hover-dns-updater.log"
                 stdin_open: true
                 working_dir: /hover-dns-updater
                 volumes:
