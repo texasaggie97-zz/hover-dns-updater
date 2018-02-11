@@ -5,7 +5,7 @@ FROM python:3.6-slim
 WORKDIR /hover-dns-updater
 
 # Copy the current directory contents into the container at /app
-ADD . /hover-dns-updater
+ADD hover-dns-updater.py hover-update.cfg requirements.txt /hover-dns-updater/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt && \
