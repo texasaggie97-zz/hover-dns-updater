@@ -31,7 +31,7 @@ default_config = {
     # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
     # Look for the subdomain record(s) that you want to update and put its/their id(s) here.
     'dns_ids': ['ENV'],
-    'logfile': '/logs/docker-hover-dns.updater.log',
+    'logfile': 'ENV',
     'run-as-service': False,
     'poll-time': 600,  # 10 minutes
 }
