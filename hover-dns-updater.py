@@ -55,7 +55,6 @@ def configure_logging(lvl=logging.INFO, logfile=None):
 
 class HoverConfig(object):
     def __init__(self, args):
-        print('0. ')
         self._config = default_config
         try:
             with open(args.config_file, 'r') as c:
