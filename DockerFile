@@ -10,7 +10,7 @@ ADD hover-dns-updater.py hover-update.cfg requirements.txt /hover-dns-updater/
 # Install any needed packages specified in requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt && \
     pip install --upgrade flake8 && \
-    flake8 . && \
+    flake8 --max-line-length 120 . && \
     pip uninstall -y flake8
 
 # Define environment variable
