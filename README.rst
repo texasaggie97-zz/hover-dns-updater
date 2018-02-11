@@ -84,52 +84,52 @@ docker-compose.yml:
 
         version: '2'
         volumes:
-          logs:
-            external: true
-            driver: rancher-nfs
+            logs:
+                external: true
+                driver: rancher-nfs
 
         services:
-          alarmserver:
-            image: texasaggie97/alarmserver
-            environment:
-              ALARMCODE: "1234"
-              CALLBACKURL_BASE: "https://graph.api.smartthings.com/api/smartapps/installations"
-              CALLBACKURL_APP_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              CALLBACKURL_ACCESS_TOKEN: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              LOGFILE: "/logs/docker-alarmserver.log"
-              ENVISALINKHOST: "192.168.0.149"
-            stdin_open: true
-            working_dir: /alarmserver
-            volumes:
-            - logs:/logs
-            tty: true
-            ports:
-            - 8111:8111/tcp
-            command:
-            - python
-            - alarmserver.py
-            labels:
-              io.rancher.container.pull_image: always
+            alarmserver:
+                image: texasaggie97/alarmserver
+                environment:
+                    ALARMCODE: "1234"
+                    CALLBACKURL_BASE: "https://graph.api.smartthings.com/api/smartapps/installations"
+                    CALLBACKURL_APP_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    CALLBACKURL_ACCESS_TOKEN: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    LOGFILE: "/logs/docker-alarmserver.log"
+                    ENVISALINKHOST: "192.168.0.149"
+                stdin_open: true
+                working_dir: /alarmserver
+                volumes:
+                - logs:/logs
+                tty: true
+                ports:
+                - 8111:8111/tcp
+                command:
+                - python
+                - alarmserver.py
+                labels:
+                    io.rancher.container.pull_image: always
 
-          hover-dns-updater:
-            image: texasaggie97/hover-dns-updater
-            environment:
-              USERNAME: "username"
-              PASSWORD: "password"
-              DNS1: "dns00000000"
-              DNS2: "dns00000001"
-              LOGFILE: "/logs/docker-hover-dns.updater.log"
-            stdin_open: true
-            working_dir: /hover-dns-updater
-            volumes:
-            - logs:/logs
-            tty: true
-            command:
-            - python
-            - hover-dns-updater.py
-            - --service
-            labels:
-      io.rancher.container.pull_image: always
+            hover-dns-updater:
+                image: texasaggie97/hover-dns-updater
+                environment:
+                    USERNAME: "username"
+                    PASSWORD: "password"
+                    DNS1: "dns00000000"
+                    DNS2: "dns00000001"
+                    LOGFILE: "/logs/docker-hover-dns.updater.log"
+                stdin_open: true
+                working_dir: /hover-dns-updater
+                volumes:
+                - logs:/logs
+                tty: true
+                command:
+                - python
+                - hover-dns-updater.py
+                - --service
+                labels:
+                    io.rancher.container.pull_image: always
 
 
 rancher-compose.yml:
@@ -139,12 +139,12 @@ rancher-compose.yml:
 
         version: '2'
         services:
-          alarmserver:
-            scale: 1
-            start_on_create: true
-          hover-dns-updater:
-            scale: 1
-    start_on_create: true
+            alarmserver:
+                scale: 1
+                start_on_create: true
+            hover-dns-updater:
+                scale: 1
+                start_on_create: true
 
 
 Contributing
