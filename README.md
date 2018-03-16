@@ -1,5 +1,7 @@
 | master branch status | ![Build Status - master branch][BuildStatus] ![Documentation Status - master branch][Docs] ![GPL License][GPLLicense] ![Test Coverage - master branch][CoverageStatus] |
 | GitHub status | ![Open Issues + Pull Requests][OpenIssues] ![Open Pull Requests][OpenPullRequests] |
+| | |
+| --- | --- |
 | Versions | 0.1.0.dev0 |
 
 
@@ -17,6 +19,8 @@
 [OpenPullRequests] https://img.shields.io/github/issues-pr/texasaggie97/hover-dns-updater.svg "Open Pull Requests"
 
 
+| | |
+| --- | --- |
 | Info | Hover DNS Updater for Dynamic IP. See [GitHub](https://github.com/texasaggie97/hover-dns-updater/)  for the latest source. |
 | Author | Mark Silva, based on a script from [GitHub](https://gist.github.com/andybarilla/b0dd93e71ff18303c059) by Andrew Barilla |
 
