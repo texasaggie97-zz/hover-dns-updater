@@ -1,3 +1,26 @@
+| master branch status | ![Build Status - master branch][BuildStatus] ![Documentation Status - master branch][Docs] ![GPL License][GPLLicense] ![Test Coverage - master branch][CoverageStatus] |
+| GitHub status | ![Open Issues + Pull Requests][OpenIssues] ![Open Pull Requests][OpenPullRequests] |
+| Versions | 0.1.0.dev0 |
+
+
+
+[BuildStatus] https://img.shields.io/travis/texasaggie97/hover-dns-updater.svg "Build Status - master branch"
+
+[Docs] https://readthedocs.org/projects/hover-dns-updater/badge/?version=latest "Documentation Status - master branch"
+
+[GPLLicense] https://img.shields.io/badge/License-GPL-yellow.svg "GPL License"
+
+[CoverageStatus] https://coveralls.io/repos/github/ni/nimi-python/badge.svg?branch=master&dummy=no_cache_please_1 "Test Coverage - master branch"
+
+[OpenIssues] https://img.shields.io/github/issues/texasaggie97/hover-dns-updater.svg "Open Issues + Pull Requests"
+
+[OpenPullRequests] https://img.shields.io/github/issues-pr/texasaggie97/hover-dns-updater.svg "Open Pull Requests"
+
+
+| Info | Hover DNS Updater for Dynamic IP. See [GitHub](https://github.com/texasaggie97/hover-dns-updater/)  for the latest source. |
+| Author | Mark Silva, based on a script from [GitHub](https://gist.github.com/andybarilla/b0dd93e71ff18303c059) by Andrew Barilla |
+
+
 About
 =====
 
