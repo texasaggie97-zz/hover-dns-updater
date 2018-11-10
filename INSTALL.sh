@@ -3,7 +3,7 @@
 # Make sure the service is stopped
 sudo sh -c "systemctl is-active --quiet hover-dns-updater && sudo service hover-dns-updater stop"
 
-sudo mkdir /etc/hover-dns-updater
+sudo mkdir -p /etc/hover-dns-updater
 sudo cp -f ./hover-dns-updater.py /etc/hover-dns-updater
 sudo cp -f ./hover-dns-updater.service /etc/systemd/system/hover-dns-updater.service
 
