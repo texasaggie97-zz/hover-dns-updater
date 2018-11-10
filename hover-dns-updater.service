@@ -5,7 +5,7 @@ After = network-online.target
 
 [Service]
 Type = forking
-ExecStart = python3 /etc/hover-dns-updater/hover-dns-updater.py --config /etc/hover-dns-updater/hover-dns-updater.json --service
+ExecStart = /usr/bin/python3 /etc/hover-dns-updater/hover-dns-updater.py --config /etc/hover-dns-updater/hover-dns-updater.json --service
 ExecStop = /bin/kill -s STOP $MAINPID
 ExecReload = /bin/kill -s STOP $MAINPID
 
