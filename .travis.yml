@@ -6,7 +6,6 @@ python:
   - 3.6
   - 3.5
   - 3.4
-  - pypy3.5-5.9.0
 
 install:
 # coveralls
