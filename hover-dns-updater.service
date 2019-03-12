@@ -1,10 +1,11 @@
 [Unit]
 Description = Hover DNS Updater for Dynamic IP
-After network-online.target
+Wants = network-online.target
+After = network-online.target
 
 [Service]
-Type = forking
-ExecStart = python3 /etc/hover-dns-updater/hover-dns-updater.py --config /etc/hover-dns-updater/hover-dns-updater.json --service
+Type = simple
+ExecStart = /usr/bin/python3 /etc/hover-dns-updater/hover-dns-updater.py --config /etc/hover-dns-updater/hover-dns-updater.json --service
 ExecStop = /bin/kill -s STOP $MAINPID
 ExecReload = /bin/kill -s STOP $MAINPID
 

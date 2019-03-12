@@ -12,7 +12,6 @@ __email__ = ""
 __status__ = "Alpha"
 
 import datetime
-import ipgetter
 import json
 import logging
 import logging.handlers
@@ -141,7 +140,7 @@ class HoverAPI(object):
                     self._current_dns_ips[entry['id']] = entry['content']
 
     def update(self):
-        current_external_ip = ipgetter.myip()
+        current_external_ip = requests.get('https://api.ipify.org').text
         logging.info('Updating - Current external IP = {0}'.format(current_external_ip))
         for dns_id in self._current_dns_ips:
             logging.debug('    {0} = {1}'.format(dns_id, self._current_dns_ips[dns_id]))

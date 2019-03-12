@@ -35,10 +35,6 @@ Prerequisites:
         -   Linux - sudo pip3 install --upgrade requests
         -   Windows - pip install --upgrade requests
 
-    -   ipgetter  
-        -   Linux - sudo pip3 install --upgrade ipgetter  
-            -   Windows - pip install --upgrade ipgetter
-
 Hover DNS IDs:
 --------------
 

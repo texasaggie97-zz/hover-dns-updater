@@ -1,0 +1,46 @@
+Here is a rough sample ansible playbook I used in my own system
+to install the service. 
+
+This will most likely need to be customized for your own setup, but it
+could be a good starting point.
+
+- name: install python3-pip
+  apt:
+    pkg: python3-pip
+    state: present
+    cache_valid_time: 3600
+    update_cache: yes
+
+- name: Git clone hover-dns-updater
+  git:
+    repo: 'https://github.com/mreishus/hover-dns-updater'
+    dest: /usr/local/src/hover-dns-updater
+
+- name: Install python requirements for hover-dns-updater
+  pip:
+    requirements: /usr/local/src/hover-dns-updater/requirements.txt
+    executable: pip3
+
+- name: Install hover-dns-updater
+  command: /bin/sh INSTALL.sh chdir=/usr/local/src/hover-dns-updater creates=/etc/hover-dns-updater/hover-dns-updater.json
+
+- name: Copy config file
+  copy:
+    src: hover-dns-updater.json
+    dest: /etc/hover-dns-updater/hover-dns-updater.json
+    owner: root
+    group: root
+    mode: 0644
+  register: hoverconf
+
+- name: keep Hover running
+  systemd:
+    state: started
+    name: hover-dns-updater
+
+- name: restart Hover on change
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: hover-dns-updater
+  when: hoverconf.changed
