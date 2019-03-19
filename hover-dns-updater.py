@@ -118,7 +118,7 @@ class HoverAPI(object):
         data = {"password": self._config.PASSWORD, "username": self._config.USERNAME, }
         data_json = json.dumps(data)
         headers = {'Content-type': 'application/json'}
-        r = requests.post("https://www.hover.com/signin", data=data_json, headers=headers)
+        r = requests.post("https://www.hover.com/api/login", data=data_json, headers=headers)
         if not r.ok or "hoverauth" not in r.cookies:
             raise HoverException(r)
         self._cookies = {"hoverauth": r.cookies["hoverauth"]}
