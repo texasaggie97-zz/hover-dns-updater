@@ -35,6 +35,13 @@ Prerequisites:
         -   Linux - sudo pip3 install --upgrade requests
         -   Windows - pip install --upgrade requests
 
+Hover TOPT Key:
+---------------
+
+-   Login to [Hover.com](https://hover.com)
+-   Enable 2FA and manually setup mobile app with the secret key.  Save secret key as configuration value 'toptkey'
+    (https://help.hover.com/hc/en-us/articles/217282267-Enable-two-step-sign-in-on-your-Hover-account)
+
 Hover DNS IDs:
 --------------
 
