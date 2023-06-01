@@ -39,7 +39,8 @@ Hover TOPT Key:
 ---------------
 
 -   Login to [Hover.com](https://hover.com)
--   Enable 2FA and manually setup mobile app with the secret key.  Save secret key as configuration value 'toptkey'
+-   Enable 2FA and manually setup mobile app with the secret key.  Save secret key as configuration value 'toptkey'.
+    ** Note: remove spaces from key displayed at end of text "If you can't scan the code, enter this secret key manually: xxxx xxxx xxxx xxxx xxxx xxxx xx"
     (https://help.hover.com/hc/en-us/articles/217282267-Enable-two-step-sign-in-on-your-Hover-account)
 
 Hover DNS IDs:
