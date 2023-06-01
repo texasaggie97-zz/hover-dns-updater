@@ -19,6 +19,7 @@ import requests
 import sys
 import time
 import os
+import pyotp
 
 import pprint
 pp = pprint.PrettyPrinter(width=120)
@@ -27,6 +28,7 @@ default_config = {
     # Your hover.com username and password
     'username': 'ENV',
     'password': 'ENV',
+    'toptkey': 'ENV',
     # Sign into hover.com and then go to: https://www.hover.com/api/domains/YOURDOMAIN.COM/dns
     # Look for the subdomain record(s) that you want to update and put its/their id(s) here.
     'dns_ids': ['ENV'],
@@ -69,6 +71,7 @@ class HoverConfig(object):
         self.USERNAME = self._config['username']
         self.PASSWORD = self._config['password']
         self.DNS_IDS = self._config['dns_ids']
+        self.TOPTKEY = self._config['toptkey']
         self.LOGFILE = self._config['logfile'] if args.log_file is None else args.log_file
         self.SERVICE = self._config['run-as-service'] if args.service is None else args.service
         self.POLLTIME = self._config['poll-time'] if args.poll_time is None else args.poll_time
@@ -79,6 +82,8 @@ class HoverConfig(object):
             self.PASSWORD = os.environ['PASSWORD']
         if self.LOGFILE == 'ENV':
             self.LOGFILE = os.environ['LOGFILE']
+        if self.TOPTKEY == 'ENV':
+            self.LOGFILE = os.environ['TOPTKEY']
         if len(self.DNS_IDS) == 1 and self.DNS_IDS[0] == 'ENV':
             self.DNS_IDS = []
             i = 1
@@ -95,6 +100,7 @@ class HoverConfig(object):
         ret_str = self.__class__.__name__ + '():\n'
         ret_str += '    USERNAME = {0}\n'.format(self.USERNAME)
         ret_str += '    PASSWORD = {0}\n'.format(self.PASSWORD)
+        ret_str += '    TOPTKEY = {0}\n'.format(self.TOPTKEY)
         ret_str += '    DNS_IDS = {0}\n'.format(pp.pformat(self.DNS_IDS))
         ret_str += '    LOGFILE = {0}\n'.format(str(self.LOGFILE))
         ret_str += '    SERVICE = {0}\n'.format(str(self.SERVICE))
@@ -115,13 +121,21 @@ class HoverAPI(object):
 
     def get_auth(self):
         logging.info('Logging in')
-        data = {"password": self._config.PASSWORD, "username": self._config.USERNAME, }
-        data_json = json.dumps(data)
-        headers = {'Content-type': 'application/json'}
-        r = requests.post("https://www.hover.com/api/login", data=data_json, headers=headers)
+
+        # Getting required cookies "hover_session" and "hoverauth"
+        r = requests.get("https://www.hover.com/signin")
+        self._cookies = {"hover_session": r.cookies["hover_session"]}
+        
+        params = {"password" : self._config.PASSWORD ,"username" : self._config.USERNAME, "token" : None }
+        r = requests.post("https://www.hover.com/signin/auth.json", json=params, cookies=self._cookies)
+
+        topt = pyotp.TOTP(self._config.TOPTKEY)
+        params = {"code": topt.now()}
+        r = requests.post("https://www.hover.com/signin/auth2.json", json=params, cookies=self._cookies)
+
         if not r.ok or "hoverauth" not in r.cookies:
             raise HoverException(r)
-        self._cookies = {"hoverauth": r.cookies["hoverauth"]}
+        self._cookies["hoverauth"] = r.cookies["hoverauth"]
         self._auth_timestamp = datetime.datetime.now()
 
     def check_auth(self):
